@@ -89,7 +89,7 @@ Users can deposit assets into the vault by calling the deposit function:
 deposit(swap_info: SwapInfo)
 ```
 
-swap_info: The swap information to buy USDT on Curve.
+swap_info: The swap information to buy underlying asset of Compound on Curve.
 
 SwapInfo:
     route: Curve swap routing address array
@@ -103,7 +103,7 @@ SwapInfo:
 Users can withdraw by calling:
 
 withdraw(swap_info: SwapInfo, _amount: uint256, output_token: address = empty(address))
-swap_info: The swap information to buy output token by USDT on Curve
+swap_info: The swap information to buy output token by underlying asset of Compound on Curve
 _amount: Bobby token amount
 output_token: Token address to get from withdrawing Bobby token
 
