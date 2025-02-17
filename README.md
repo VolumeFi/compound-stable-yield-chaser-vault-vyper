@@ -80,6 +80,40 @@ This Vyper smart contract is designed to manage a vault that chases stable yield
 - `update_service_fee_collector`: Updates the service fee collector address.
 - `update_service_fee`: Updates the service fee percentage.
 
+## Usage
+### Depositing Funds
+
+Users can deposit assets into the vault by calling the deposit function:
+
+```
+deposit(swap_info: SwapInfo)
+```
+
+swap_info: The swap information to buy USDT on Curve.
+
+SwapInfo:
+    route: Curve swap routing address array
+    swap_params: Curve swap parameters
+    amount: Curve swap amount
+    expected: Minimum amount to prevent high slippage
+    pools: Curve Pool addresses
+
+### Withdrawing Funds
+
+Users can withdraw by calling:
+
+withdraw(swap_info: SwapInfo, _amount: uint256, output_token: address = empty(address))
+swap_info: The swap information to buy output token by USDT on Curve
+_amount: Bobby token amount
+output_token: Token address to get from withdrawing Bobby token
+
+SwapInfo:
+    route: Curve swap routing address array
+    swap_params: Curve swap parameters
+    amount: Curve swap amount
+    expected: Minimum amount to prevent high slippage
+    pools: Curve Pool addresses
+
 ## License
 
 This project is licensed under the Apache 2.0 License.
