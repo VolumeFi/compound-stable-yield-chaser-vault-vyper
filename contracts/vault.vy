@@ -59,10 +59,12 @@ event Deposited:
     asset: address
     amount0: uint256
     balance: uint256
+    nonce: uint256
 
 event Released:
     recipient: address
     amount: uint256
+    nonce: uint256
 
 event UpdateAsset:
     old_asset: address
@@ -118,6 +120,7 @@ service_fee_collector: public(address)
 service_fee: public(uint256)
 paloma: public(bytes32)
 nonce_check: public(HashMap[uint256, bool])
+nonce: public(uint256)
 
 @deploy
 def __init__(_compass: address, _weth: address, initial_c_asset: address, _router: address, _refund_wallet: address, _entrance_fee: uint256, _service_fee_collector: address, _service_fee: uint256, _redemption_fee: uint256, _redemption_fee_collector: address):
@@ -199,7 +202,9 @@ def deposit(swap_info: SwapInfo):
     _amount = _amount * 10 ** convert(staticcall ERC20(self.bobby).decimals(), uint256) // 10 ** convert(staticcall ERC20(_asset).decimals(), uint256)
     self.deposits[msg.sender] += _amount
     self.total_deposit += _amount
-    log Deposited(msg.sender, swap_info.route[0], _asset, swap_info.amount, _amount)
+    _nonce: uint256 = self.nonce
+    self.nonce = unsafe_add(_nonce, 1)
+    log Deposited(msg.sender, swap_info.route[0], _asset, swap_info.amount, _amount, _nonce)
 
 @internal
 def _paloma_check():
@@ -249,7 +254,7 @@ def release_bobby(recipient: address, amount: uint256, nonce: uint256):
     self.nonce_check[nonce] = True
     self.deposits[recipient] -= amount
     self.total_deposit -= amount
-    log Released(recipient, amount)
+    log Released(recipient, amount, nonce)
 
 @external
 @view
