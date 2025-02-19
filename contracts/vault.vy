@@ -199,7 +199,7 @@ def deposit(swap_info: SwapInfo):
     self._safe_approve(_asset, _c_asset, _amount)
     extcall CToken(_c_asset).supply(_asset, _amount)
     self.input_token[msg.sender] = swap_info.route[0]
-    _amount = _amount * 10 ** convert(staticcall ERC20(self.bobby).decimals(), uint256) // 10 ** convert(staticcall ERC20(_asset).decimals(), uint256)
+    _amount = _amount * 10 ** convert(staticcall ERC20(self.bobby).decimals(), uint256) * DENOMINATOR // 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // BOBBY_RATE
     self.deposits[msg.sender] += _amount
     self.total_deposit += _amount
     _nonce: uint256 = self.nonce
@@ -279,7 +279,7 @@ def withdraw(swap_info: SwapInfo, _amount: uint256, output_token: address = empt
     benefit: uint256 = 0
     if _asset_for_bobby > asset_balance:
         benefit = asset_balance - _asset_for_bobby
-    withdraw_balance: uint256 = _amount * BOBBY_RATE * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256)
+    withdraw_balance: uint256 = _amount * BOBBY_RATE * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256) // DENOMINATOR
     if benefit > 0:
         withdraw_balance += benefit * _amount // _total_supply
     if withdraw_balance > asset_balance:
@@ -325,7 +325,7 @@ def withdraw_amount(_amount: uint256) -> uint256:
     benefit: uint256 = 0
     if _asset_for_bobby > asset_balance:
         benefit = asset_balance - _asset_for_bobby
-    withdraw_balance: uint256 = _amount * BOBBY_RATE * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256)
+    withdraw_balance: uint256 = _amount * BOBBY_RATE * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256) // DENOMINATOR
     if benefit > 0:
         withdraw_balance += benefit * _amount // _total_supply
     if withdraw_balance > asset_balance:
