@@ -269,6 +269,11 @@ def c_asset_share() -> uint256:
     return staticcall ERC20(_c_asset).balanceOf(self) * DENOMINATOR // staticcall ERC20(_c_asset).totalSupply()
 
 @external
+@view
+def c_asset_balance() -> uint256:
+    return staticcall ERC20(self.c_asset).balanceOf(self)
+
+@external
 @nonreentrant
 def withdraw(swap_info: SwapInfo, _amount: uint256, output_token: address = empty(address)):
     _asset: address = self.asset
