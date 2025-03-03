@@ -44,6 +44,9 @@ interface CToken:
     def balanceOf(_owner: address) -> uint256: view
     def totalSupply() -> uint256: view
 
+interface Compass:
+    def slc_switch() -> bool: view
+
 VETH: constant(address) = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
 DENOMINATOR: constant(uint256) = 10 ** 18
 BOBBY_RATE: constant(uint256) = 8 * 10 ** 17
@@ -348,7 +351,8 @@ def withdraw_amount(_amount: uint256) -> uint256:
 
 @external
 def update_compass(new_compass: address):
-    self._paloma_check()
+    assert msg.sender == self.compass, "Not compass"
+    assert not staticcall Compass(msg.sender).slc_switch(), "SLC is unavailable"
     self.compass = new_compass
     log UpdateCompass(msg.sender, new_compass)
 
