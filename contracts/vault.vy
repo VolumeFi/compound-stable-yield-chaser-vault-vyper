@@ -198,6 +198,7 @@ def deposit(swap_info: SwapInfo):
             _amount = staticcall ERC20(_asset).balanceOf(self)
             extcall CurveSwapRouter(Router).exchange(swap_info.route, swap_info.swap_params, input_amount, swap_info.expected, swap_info.pools)
             _amount = staticcall ERC20(_asset).balanceOf(self) - _amount
+    assert _amount > 0, "Invalid swap"
     _c_asset: address = self.c_asset
     self._safe_approve(_asset, _c_asset, _amount)
     extcall CToken(_c_asset).supply(_asset, _amount)
