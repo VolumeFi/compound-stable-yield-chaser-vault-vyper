@@ -18,7 +18,6 @@ interface ERC20:
     def balanceOf(_owner: address) -> uint256: view
     def totalSupply() -> uint256: view
     def decimals() -> uint8: view
-    def burn(_amount: uint256): nonpayable
     def approve(_spender: address, _value: uint256) -> bool: nonpayable
     def transfer(_to: address, _value: uint256) -> bool: nonpayable
     def transferFrom(_from: address, _to: address, _value: uint256) -> bool: nonpayable
@@ -286,7 +285,7 @@ def withdraw(swap_info: SwapInfo, _amount: uint256, output_token: address = empt
     assert _amount > 0, "Invalid withdraw"
     _total_supply: uint256 = staticcall ERC20(_bobby).totalSupply()
     self._safe_transfer_from(_bobby, msg.sender, self, _amount)
-    extcall ERC20(_bobby).burn(_amount)
+    self._safe_transfer(_bobby, self.compass, _amount)
     extcall CToken(_c_asset).withdraw(_asset, max_value(uint256))
     asset_balance: uint256 = staticcall ERC20(_asset).balanceOf(self)
     _total_bobby: uint256 = staticcall ERC20(_bobby).totalSupply() + self.total_deposit
