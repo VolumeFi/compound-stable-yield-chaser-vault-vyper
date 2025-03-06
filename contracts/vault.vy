@@ -125,7 +125,7 @@ nonce_check: public(HashMap[uint256, bool])
 nonce: public(uint256)
 
 @deploy
-def __init__(_compass: address, _weth: address, initial_c_asset: address, _router: address, _refund_wallet: address, _entrance_fee: uint256, _service_fee_collector: address, _service_fee: uint256, _redemption_fee: uint256, _redemption_fee_collector: address):
+def __init__(_compass: address, _weth: address, initial_c_asset: address, _router: address, _refund_wallet: address, _entrance_fee: uint256, _service_fee_collector: address, _service_fee: uint256, _redemption_fee: uint256, _redemption_fee_collector: address, _initial_nonce: uint256):
     self.compass = _compass
     self.refund_wallet = _refund_wallet
     self.entrance_fee = _entrance_fee
@@ -139,6 +139,7 @@ def __init__(_compass: address, _weth: address, initial_c_asset: address, _route
     self.c_asset = initial_c_asset
     _asset: address = staticcall CToken(initial_c_asset).baseToken()
     self.asset = _asset
+    self.nonce = _initial_nonce
     log UpdateAsset(empty(address), _asset, 0, 0)
     log UpdateCompass(empty(address), _compass)
     log UpdateRefundWallet(empty(address), _refund_wallet)
@@ -289,9 +290,9 @@ def withdraw(swap_info: SwapInfo, _amount: uint256, output_token: address = empt
     extcall CToken(_c_asset).withdraw(_asset, max_value(uint256))
     asset_balance: uint256 = staticcall ERC20(_asset).balanceOf(self)
     _total_bobby: uint256 = staticcall ERC20(_bobby).totalSupply() + self.total_deposit
-    _asset_for_bobby: uint256 = _total_bobby * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256)
+    _asset_for_bobby: uint256 = _total_bobby * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256) * BOBBY_RATE // DENOMINATOR
     benefit: uint256 = 0
-    if _asset_for_bobby > asset_balance:
+    if asset_balance > _asset_for_bobby:
         benefit = asset_balance - _asset_for_bobby
     withdraw_balance: uint256 = _amount * BOBBY_RATE * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256) // DENOMINATOR
     if benefit > 0:
@@ -335,9 +336,9 @@ def withdraw_amount(_amount: uint256) -> uint256:
     _total_supply: uint256 = staticcall ERC20(_bobby).totalSupply()
     asset_balance: uint256 = staticcall ERC20(_c_asset).balanceOf(self)
     _total_bobby: uint256 = staticcall ERC20(_bobby).totalSupply() + self.total_deposit
-    _asset_for_bobby: uint256 = _total_bobby * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256)
+    _asset_for_bobby: uint256 = _total_bobby * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256) * BOBBY_RATE // DENOMINATOR
     benefit: uint256 = 0
-    if _asset_for_bobby > asset_balance:
+    if asset_balance > _asset_for_bobby:
         benefit = asset_balance - _asset_for_bobby
     withdraw_balance: uint256 = _amount * BOBBY_RATE * 10 ** convert(staticcall ERC20(_asset).decimals(), uint256) // 10 ** convert(staticcall ERC20(_bobby).decimals(), uint256) // DENOMINATOR
     if benefit > 0:
