@@ -56,7 +56,7 @@ Router: public(immutable(address))
 
 
 event Deposited:
-    depositor: address
+    depositor: indexed(address)
     token0: address
     asset: address
     amount0: uint256
@@ -325,6 +325,9 @@ def withdraw(swap_info: SwapInfo, _amount: uint256, output_token: address = empt
             out_amount = staticcall ERC20(_output_token).balanceOf(self) - out_amount
             self._safe_transfer(_output_token, msg.sender, out_amount)
         assert out_amount > 0, "Invalid swap"
+    asset_balance = staticcall ERC20(_asset).balanceOf(self)
+    self._safe_approve(_asset, _c_asset, asset_balance)
+    extcall CToken(_c_asset).supply(_asset, asset_balance)
     log Withdrawn(msg.sender, _output_token, _asset, out_amount, withdraw_balance, _amount)
 
 @external
